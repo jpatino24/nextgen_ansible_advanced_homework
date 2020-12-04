@@ -1,0 +1,23 @@
+- name: Fetch Instance Info
+  os_server_info:
+    cloud: openstack
+    region_name: regionOne
+  register: r_os_servers
+  delegate_to: localhost
+
+- name: Add host
+  add_host:
+    name: "{{ item.public_v4 }}"
+    group:
+      - "{{ item.metadata.group }}"
+      - "{{ item.metadata.deployment_name }}"
+  loop: "{{ r_os_servers.openstack_servers }}"
+  delegate_to: localhost
+
+- name: Add multiple repositories into the same file (1/2)
+  yum_repository:
+    name: internal
+    description: internal repo
+    file: internal.repo
+    baseurl: http://www.opentlc.com/download/ansible_bootcamp/repo/internal.repo
+    gpgcheck: no
